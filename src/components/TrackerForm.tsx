@@ -3,152 +3,265 @@ import { Translation } from '../i18n';
 import { PoopEntry, EntryInput } from '../hooks/usePoopEntries';
 
 interface TrackerFormProps {
-    onAddEntry: (entry: EntryInput) => Promise<void>;
-    onUpdateEntry: (id: string, entry: Partial<EntryInput>) => Promise<void>;
-    editingEntry: PoopEntry | null;
-    setEditingEntry: (entry: PoopEntry | null) => void;
-    t: Translation;
+  onAddEntry: (entry: EntryInput) => Promise<void>;
+  onUpdateEntry: (id: string, entry: Partial<EntryInput>) => Promise<void>;
+  editingEntry: PoopEntry | null;
+  setEditingEntry: (entry: PoopEntry | null) => void;
+  t: Translation;
 }
 
 function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry, t }: TrackerFormProps) {
-    const [formData, setFormData] = useState({
-        date: new Date().toISOString().split('T')[0],
-        time: new Date().toTimeString().split(' ')[0].slice(0, 5),
-        consistency: 4, // Default to Normal
-        amount: '',
-        note: ''
+  const [formData, setFormData] = useState({
+    date: new Date().toISOString().split('T')[0],
+    time: new Date().toTimeString().split(' ')[0].slice(0, 5),
+    consistency: 4,
+    amount: '',
+    note: ''
+  });
+
+  useEffect(() => {
+    if (editingEntry) {
+      const d = new Date(editingEntry.datetime);
+      setFormData({
+        date: d.toISOString().split('T')[0],
+        time: d.toTimeString().split(' ')[0].slice(0, 5),
+        consistency: editingEntry.consistency,
+        amount: editingEntry.amount || '',
+        note: editingEntry.note || ''
+      });
+    }
+  }, [editingEntry]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const entryData: EntryInput = {
+      datetime: new Date(`${formData.date}T${formData.time}`).toISOString(),
+      consistency: formData.consistency,
+      amount: formData.amount,
+      note: formData.note
+    };
+    if (editingEntry) {
+      await onUpdateEntry(editingEntry.id, entryData);
+      setEditingEntry(null);
+    } else {
+      await onAddEntry(entryData);
+    }
+    setFormData({
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toTimeString().split(' ')[0].slice(0, 5),
+      consistency: 4,
+      amount: '',
+      note: ''
     });
+  };
 
-    useEffect(() => {
-        if (editingEntry) {
-            const dateObj = new Date(editingEntry.datetime);
-            setFormData({
-                date: dateObj.toISOString().split('T')[0],
-                time: dateObj.toTimeString().split(' ')[0].slice(0, 5),
-                consistency: editingEntry.consistency,
-                amount: editingEntry.amount || '',
-                note: editingEntry.note || ''
-            });
-        }
-    }, [editingEntry]);
+  const handleCancel = () => {
+    setEditingEntry(null);
+    setFormData({
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toTimeString().split(' ')[0].slice(0, 5),
+      consistency: 4,
+      amount: '',
+      note: ''
+    });
+  };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        const entryData: EntryInput = {
-            datetime: new Date(`${formData.date}T${formData.time}`).toISOString(),
-            consistency: formData.consistency,
-            amount: formData.amount,
-            note: formData.note
-        };
-
-        if (editingEntry) {
-            await onUpdateEntry(editingEntry.id, entryData);
-            setEditingEntry(null);
-        } else {
-            await onAddEntry(entryData);
+  return (
+    <>
+      <style>{`
+        .tf-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 14px 20px;
         }
 
-        // Reset form
-        setFormData({
-            date: new Date().toISOString().split('T')[0],
-            time: new Date().toTimeString().split(' ')[0].slice(0, 5),
-            consistency: 4,
-            amount: '',
-            note: ''
-        });
-    };
+        .tf-field {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
 
-    const handleCancel = () => {
-        setEditingEntry(null);
-        setFormData({
-            date: new Date().toISOString().split('T')[0],
-            time: new Date().toTimeString().split(' ')[0].slice(0, 5),
-            consistency: 4,
-            amount: '',
-            note: ''
-        });
-    };
+        .tf-field.full { grid-column: 1 / -1; }
 
-    const inputClasses = "py-2 px-3 border border-border rounded-none font-inherit text-[0.9rem] bg-card-bg text-text w-full box-border min-h-[40px] focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/10";
-    const labelClasses = "block font-medium mb-1.5 text-[0.9rem] text-text";
-    const btnClasses = "bg-primary text-bg border border-primary py-2 px-4 rounded-none font-medium cursor-pointer transition-all duration-200 text-[0.9rem] min-h-[40px] inline-flex items-center justify-center hover:bg-primary-dark hover:opacity-90";
+        .tf-label {
+          font-family: var(--font-mono);
+          font-size: 9.5px;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+          color: var(--ink-60);
+        }
 
-    return (
-        <form onSubmit={handleSubmit}>
-            <div className="mb-4">
-                <label className={labelClasses}>{t.dateAndTime}</label>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
-                    <input
-                        type="date"
-                        required
-                        className={inputClasses}
-                        value={formData.date}
-                        onChange={e => setFormData({ ...formData, date: e.target.value })}
-                    />
-                    <input
-                        type="time"
-                        required
-                        className={inputClasses}
-                        value={formData.time}
-                        onChange={e => setFormData({ ...formData, time: e.target.value })}
-                    />
-                </div>
-            </div>
+        .tf-input, .tf-select {
+          appearance: none;
+          background: transparent;
+          border: 1px solid var(--hairline);
+          border-radius: 0;
+          color: var(--ink);
+          font-family: var(--font-sans);
+          font-size: 13.5px;
+          font-weight: 400;
+          padding: 9px 12px;
+          width: 100%;
+          transition: border-color 0.15s, box-shadow 0.15s;
+          outline: none;
+          -webkit-appearance: none;
+        }
 
-            <div className="mb-4">
-                <label className={labelClasses}>{t.consistency}</label>
-                <select
-                    className={inputClasses}
-                    value={formData.consistency}
-                    onChange={e => setFormData({ ...formData, consistency: Number(e.target.value) })}
-                >
-                    {Object.entries(t.types).map(([value, label]) => (
-                        <option key={value} value={value}>{label}</option>
-                    ))}
-                </select>
-            </div>
+        .tf-select {
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(10,10,10,0.3)'/%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          padding-right: 32px;
+          cursor: pointer;
+        }
 
-            <div className="mb-4">
-                <label className={labelClasses}>{t.amount}</label>
-                <select
-                    className={inputClasses}
-                    value={formData.amount || ''}
-                    onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                >
-                    <option value="">{t.selectAmount}</option>
-                    <option value="Small">{t.amountSmall}</option>
-                    <option value="Normal">{t.amountNormal}</option>
-                    <option value="Large">{t.amountLarge}</option>
-                </select>
-            </div>
+        [data-theme="dark"] .tf-select {
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(237,233,227,0.4)'/%3E%3C/svg%3E");
+        }
 
-            <div className="mb-4">
-                <label className={labelClasses}>{t.notes}</label>
-                <input
-                    type="text"
-                    className={inputClasses}
-                    placeholder={t.notesPlaceholder}
-                    value={formData.note}
-                    onChange={e => setFormData({ ...formData, note: e.target.value })}
-                />
-            </div>
+        .tf-input:focus, .tf-select:focus {
+          border-color: var(--ink-60);
+          box-shadow: 0 0 0 3px var(--ink-5);
+        }
 
-            <div className="flex gap-2 mt-2">
-                <button type="submit" className={`${btnClasses} flex-1`}>
-                    {editingEntry ? 'Update Entry' : t.logEntry}
-                </button>
-                {editingEntry && (
-                    <button
-                        type="button"
-                        onClick={handleCancel}
-                        className="bg-transparent text-text border border-border py-2 px-4 rounded-none font-medium cursor-pointer transition-all duration-200 text-[0.9rem] min-h-[40px] inline-flex items-center justify-center hover:bg-border"
-                    >
-                        Cancel
-                    </button>
-                )}
-            </div>
-        </form>
-    );
+        .tf-input::placeholder { color: var(--ink-30); }
+
+        .tf-input[type="date"]::-webkit-calendar-picker-indicator,
+        .tf-input[type="time"]::-webkit-calendar-picker-indicator {
+          opacity: 0.4;
+          cursor: pointer;
+          filter: var(--ink) invert(0);
+        }
+
+        [data-theme="dark"] .tf-input[type="date"]::-webkit-calendar-picker-indicator,
+        [data-theme="dark"] .tf-input[type="time"]::-webkit-calendar-picker-indicator {
+          filter: invert(1);
+        }
+
+        .tf-select option { background: var(--paper); color: var(--ink); }
+
+        .tf-actions {
+          display: flex;
+          gap: 8px;
+          margin-top: 20px;
+        }
+
+        .btn-primary {
+          flex: 1;
+          background: var(--ink);
+          color: var(--paper);
+          border: 1px solid var(--ink);
+          font-family: var(--font-mono);
+          font-size: 10px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          padding: 11px 20px;
+          cursor: pointer;
+          transition: opacity 0.15s;
+        }
+
+        .btn-primary:hover { opacity: 0.8; }
+
+        .btn-ghost {
+          background: transparent;
+          color: var(--ink-60);
+          border: 1px solid var(--hairline);
+          font-family: var(--font-mono);
+          font-size: 10px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          padding: 11px 20px;
+          cursor: pointer;
+          transition: border-color 0.15s, color 0.15s;
+        }
+
+        .btn-ghost:hover {
+          border-color: var(--hairline-strong);
+          color: var(--ink);
+        }
+
+        @media (max-width: 480px) {
+          .tf-grid { grid-template-columns: 1fr; }
+          .tf-field.full { grid-column: 1; }
+        }
+      `}</style>
+
+      <form onSubmit={handleSubmit}>
+        <div className="tf-grid">
+          <div className="tf-field">
+            <label className="tf-label">{t.dateAndTime.split(' ')[0] || 'Date'}</label>
+            <input
+              type="date"
+              required
+              className="tf-input"
+              value={formData.date}
+              onChange={e => setFormData({ ...formData, date: e.target.value })}
+            />
+          </div>
+
+          <div className="tf-field">
+            <label className="tf-label">Time</label>
+            <input
+              type="time"
+              required
+              className="tf-input"
+              value={formData.time}
+              onChange={e => setFormData({ ...formData, time: e.target.value })}
+            />
+          </div>
+
+          <div className="tf-field">
+            <label className="tf-label">{t.consistency}</label>
+            <select
+              className="tf-select"
+              value={formData.consistency}
+              onChange={e => setFormData({ ...formData, consistency: Number(e.target.value) })}
+            >
+              {Object.entries(t.types).map(([value, label]) => (
+                <option key={value} value={value}>{label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="tf-field">
+            <label className="tf-label">{t.amount}</label>
+            <select
+              className="tf-select"
+              value={formData.amount || ''}
+              onChange={e => setFormData({ ...formData, amount: e.target.value })}
+            >
+              <option value="">{t.selectAmount}</option>
+              <option value="Small">{t.amountSmall}</option>
+              <option value="Normal">{t.amountNormal}</option>
+              <option value="Large">{t.amountLarge}</option>
+            </select>
+          </div>
+
+          <div className="tf-field full">
+            <label className="tf-label">{t.notes}</label>
+            <input
+              type="text"
+              className="tf-input"
+              placeholder={t.notesPlaceholder}
+              value={formData.note}
+              onChange={e => setFormData({ ...formData, note: e.target.value })}
+            />
+          </div>
+        </div>
+
+        <div className="tf-actions">
+          <button type="submit" className="btn-primary">
+            {editingEntry ? 'Update Entry' : t.logEntry}
+          </button>
+          {editingEntry && (
+            <button type="button" className="btn-ghost" onClick={handleCancel}>
+              Cancel
+            </button>
+          )}
+        </div>
+      </form>
+    </>
+  );
 }
 
 export default TrackerForm;
