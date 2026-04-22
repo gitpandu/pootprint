@@ -37,7 +37,7 @@ function TrackerChart({ entries, theme, t, lang, view = 'weekly' }) {
     }, [entries, lang, view]);
 
     if (entries.length === 0) {
-        return <div className="empty-state">{t.noData}</div>;
+        return <div className="text-center text-text-light py-[30px] bg-bg rounded-none">{t.noData}</div>;
     }
 
     const isDark = theme === 'dark';
@@ -47,7 +47,7 @@ function TrackerChart({ entries, theme, t, lang, view = 'weekly' }) {
         : { backgroundColor: '#fff', border: 'none', borderRadius: '8px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' };
 
     return (
-        <div style={{ width: '100%', height: 300 }}>
+        <div className="w-full h-[300px]">
             <ResponsiveContainer>
                 <BarChart data={data} margin={{ top: 20, right: 30, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={isDark ? '#374151' : '#e5e7eb'} />

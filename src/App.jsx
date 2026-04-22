@@ -45,14 +45,14 @@ function App() {
   const [chartView, setChartView] = useState('weekly');
 
   return (
-    <div className="app-container">
-      <header className="app-header">
-        <div className="header-content">
-          <h1>{t.title}</h1>
+    <div className="max-w-[900px] mx-auto px-4 py-10 sm:px-5">
+      <header className="mb-7 pb-5 border-b border-border flex justify-between items-center">
+        <div className="flex-1">
+          <h1 className="text-2xl sm:text-[2rem] font-semibold m-0 text-text">{t.title}</h1>
         </div>
-        <div className="header-actions" style={{ display: 'flex', gap: '8px' }}>
+        <div className="flex gap-2">
           <button
-            className="theme-toggle"
+            className="bg-transparent border border-border text-text p-2 cursor-pointer flex items-center justify-center transition-all duration-200 min-w-[40px] h-10 font-semibold text-[0.8rem] hover:bg-border"
             onClick={toggleLang}
             aria-label="Toggle Language"
             title={lang === 'en' ? 'Switch to Indonesia' : 'Switch to English'}
@@ -60,7 +60,7 @@ function App() {
             {lang.toUpperCase()}
           </button>
           <button
-            className="theme-toggle"
+            className="bg-transparent border border-border text-text p-2 cursor-pointer flex items-center justify-center transition-all duration-200 min-w-[40px] h-10 font-semibold text-[0.8rem] hover:bg-border"
             onClick={toggleTheme}
             aria-label="Toggle Dark Mode"
           >
@@ -69,10 +69,12 @@ function App() {
         </div>
       </header>
 
-      <main className="main-content">
-        <section className="tracker-section">
-          <div className="card">
-            <h2>{editingEntry ? 'Edit Entry' : t.newEntry}</h2>
+      <main>
+        <section>
+          <div className="bg-card-bg p-6 border border-border mb-6 transition-colors duration-300">
+            <h2 className="text-[1.1rem] font-semibold mt-0 mb-5 text-text uppercase tracking-wider">
+              {editingEntry ? 'Edit Entry' : t.newEntry}
+            </h2>
             <TrackerForm
               onAddEntry={addEntry}
               onUpdateEntry={updateEntry}
@@ -83,27 +85,22 @@ function App() {
           </div>
         </section>
 
-        <section className="stats-section">
-          <div className="card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h2>{t.views[chartView]}</h2>
-              <div className="view-selector" style={{ display: 'flex', border: '1px solid var(--color-border)' }}>
+        <section>
+          <div className="bg-card-bg p-6 border border-border mb-6 transition-colors duration-300">
+            <div className="flex justify-between items-center mb-5">
+              <h2 className="text-[1.1rem] font-semibold m-0 text-text uppercase tracking-wider">
+                {t.views[chartView]}
+              </h2>
+              <div className="flex border border-border">
                 {['weekly', 'yearly'].map(v => (
                   <button
                     key={v}
                     onClick={() => setChartView(v)}
-                    className="view-btn"
-                    style={{
-                      flex: 1,
-                      backgroundColor: chartView === v ? 'var(--color-primary)' : 'transparent',
-                      color: chartView === v ? 'var(--color-bg)' : 'var(--color-text)',
-                      border: 'none',
-                      padding: '6px 16px',
-                      fontSize: '0.8rem',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                    }}
+                    className={`flex-1 border-none py-1.5 px-4 text-[0.8rem] font-medium cursor-pointer transition-all duration-200 ${
+                      chartView === v 
+                        ? 'bg-primary text-bg' 
+                        : 'bg-transparent text-text'
+                    }`}
                   >
                     {t.views[v]}
                   </button>
@@ -114,9 +111,11 @@ function App() {
           </div>
         </section>
 
-        <section className="history-section">
-          <div className="card">
-            <h2>{t.history} ({entries.length})</h2>
+        <section>
+          <div className="bg-card-bg p-6 border border-border mb-6 transition-colors duration-300">
+            <h2 className="text-[1.1rem] font-semibold mt-0 mb-5 text-text uppercase tracking-wider">
+              {t.history} ({entries.length})
+            </h2>
             <EntryList
               entries={entries}
               onDelete={deleteEntry}

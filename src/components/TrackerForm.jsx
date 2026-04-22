@@ -59,32 +59,36 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
         });
     };
 
+    const inputClasses = "py-2 px-3 border border-border rounded-none font-inherit text-[0.9rem] bg-card-bg text-text w-full box-border min-h-[40px] focus:outline-none focus:border-primary focus:ring-3 focus:ring-primary/10";
+    const labelClasses = "block font-medium mb-1.5 text-[0.9rem] text-text";
+    const btnClasses = "bg-primary text-bg border border-primary py-2 px-4 rounded-none font-medium cursor-pointer transition-all duration-200 text-[0.9rem] min-h-[40px] inline-flex items-center justify-center hover:bg-primary-dark hover:opacity-90";
+
     return (
-        <form className="tracker-form" onSubmit={handleSubmit}>
-            <div className="form-group">
-                <label>{t.dateAndTime}</label>
-                <div className="datetime-inputs">
+        <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+                <label className={labelClasses}>{t.dateAndTime}</label>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                     <input
                         type="date"
                         required
-                        className="form-control"
+                        className={inputClasses}
                         value={formData.date}
                         onChange={e => setFormData({ ...formData, date: e.target.value })}
                     />
                     <input
                         type="time"
                         required
-                        className="form-control"
+                        className={inputClasses}
                         value={formData.time}
                         onChange={e => setFormData({ ...formData, time: e.target.value })}
                     />
                 </div>
             </div>
 
-            <div className="form-group">
-                <label>{t.consistency}</label>
+            <div className="mb-4">
+                <label className={labelClasses}>{t.consistency}</label>
                 <select
-                    className="form-control"
+                    className={inputClasses}
                     value={formData.consistency}
                     onChange={e => setFormData({ ...formData, consistency: Number(e.target.value) })}
                 >
@@ -94,10 +98,10 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
                 </select>
             </div>
 
-            <div className="form-group">
-                <label>{t.amount}</label>
+            <div className="mb-4">
+                <label className={labelClasses}>{t.amount}</label>
                 <select
-                    className="form-control"
+                    className={inputClasses}
                     value={formData.amount || ''}
                     onChange={e => setFormData({ ...formData, amount: e.target.value })}
                 >
@@ -108,31 +112,26 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
                 </select>
             </div>
 
-            <div className="form-group">
-                <label>{t.notes}</label>
+            <div className="mb-4">
+                <label className={labelClasses}>{t.notes}</label>
                 <input
                     type="text"
-                    className="form-control"
+                    className={inputClasses}
                     placeholder={t.notesPlaceholder}
                     value={formData.note}
                     onChange={e => setFormData({ ...formData, note: e.target.value })}
                 />
             </div>
 
-            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
-                <button type="submit" className="btn btn-submit" style={{ flex: 1 }}>
+            <div className="flex gap-2 mt-2">
+                <button type="submit" className={`${btnClasses} flex-1`}>
                     {editingEntry ? 'Update Entry' : t.logEntry}
                 </button>
                 {editingEntry && (
                     <button
                         type="button"
                         onClick={handleCancel}
-                        className="btn"
-                        style={{
-                            backgroundColor: 'transparent',
-                            color: 'var(--color-text)',
-                            border: '1px solid var(--color-border)',
-                        }}
+                        className="bg-transparent text-text border border-border py-2 px-4 rounded-none font-medium cursor-pointer transition-all duration-200 text-[0.9rem] min-h-[40px] inline-flex items-center justify-center hover:bg-border"
                     >
                         Cancel
                     </button>
