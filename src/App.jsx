@@ -107,7 +107,14 @@ function App() {
                 ))}
               </div>
             </div>
-            <TrackerChart entries={entries} theme={theme} t={t} lang={lang} view={chartView} />
+            <TrackerChart 
+              key={`${chartView}-${lang}`} 
+              entries={entries} 
+              theme={theme} 
+              t={t} 
+              lang={lang} 
+              view={chartView} 
+            />
           </div>
         </section>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 const API_URL = '/api';
 
@@ -6,21 +6,27 @@ export function usePoopEntries() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchEntries = async () => {
+  const fetchEntries = useCallback(async (isMounted = { current: true }) => {
     try {
       const response = await fetch(`${API_URL}/entries`);
       const data = await response.json();
-      setEntries(data);
-      setLoading(false);
+      if (isMounted.current) {
+        setEntries(data);
+        setLoading(false);
+      }
     } catch (error) {
       console.error("Error fetching entries:", error);
-      setLoading(false);
+      if (isMounted.current) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchEntries();
-  }, []);
+    const isMounted = { current: true };
+    Promise.resolve().then(() => fetchEntries(isMounted));
+    return () => { isMounted.current = false; };
+  }, [fetchEntries]);
 
   const addEntry = async (entry) => {
     try {
