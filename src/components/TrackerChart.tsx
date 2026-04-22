@@ -1,10 +1,20 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { format, startOfDay, eachDayOfInterval, subDays, isSameDay, startOfMonth, subMonths, eachMonthOfInterval, isSameMonth } from 'date-fns';
 import { id, enUS } from 'date-fns/locale';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Translation } from '../i18n';
+import { PoopEntry } from '../hooks/usePoopEntries';
 
-function TrackerChart({ entries, theme, t, lang, view = 'weekly' }) {
+interface TrackerChartProps {
+    entries: PoopEntry[];
+    theme: string;
+    t: Translation;
+    lang: string;
+    view?: 'weekly' | 'yearly';
+}
+
+function TrackerChart({ entries, theme, t, lang, view = 'weekly' }: TrackerChartProps) {
     const [offset, setOffset] = useState(0);
 
     const { data, dateRangeLabel } = useMemo(() => {

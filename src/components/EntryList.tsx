@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Trash2, Edit, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { id, enUS } from 'date-fns/locale';
+import { Translation } from '../i18n';
+import { PoopEntry } from '../hooks/usePoopEntries';
 
-function EntryList({ entries, onDelete, onEdit, t, lang }) {
+interface EntryListProps {
+    entries: PoopEntry[];
+    onDelete: (id: string) => Promise<void>;
+    onEdit: (entry: PoopEntry) => void;
+    t: Translation;
+    lang: string;
+}
+
+function EntryList({ entries, onDelete, onEdit, t, lang }: EntryListProps) {
     const [currentPage, setCurrentPage] = useState(1);
     const PAGE_SIZE = 5;
 
     // Sort by datetime desc
-    const sortedEntries = [...entries].sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+    const sortedEntries = [...entries].sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime());
     
     const totalPages = Math.ceil(sortedEntries.length / PAGE_SIZE);
 
@@ -21,12 +31,16 @@ function EntryList({ entries, onDelete, onEdit, t, lang }) {
 
     const dateLocale = lang === 'id' ? id : enUS;
 
-    const getAmountLabel = (amount) => {
+    const getAmountLabel = (amount: string) => {
         if (!amount) return '';
         if (amount === 'Small') return t.amountSmall;
         if (amount === 'Normal') return t.amountNormal;
         if (amount === 'Large') return t.amountLarge;
         return amount;
+    }
+
+    if (entries.length === 0) {
+        return <div className="text-center text-text-light py-[30px] bg-bg rounded-none">{t.noEntries}</div>;
     }
 
     return (

@@ -2,11 +2,26 @@ import { useState, useEffect, useCallback } from 'react';
 
 const API_URL = '/api';
 
+export interface PoopEntry {
+  id: string;
+  datetime: string;
+  consistency: number;
+  amount: string;
+  note: string;
+}
+
+export interface EntryInput {
+  datetime: string;
+  consistency: number;
+  amount: string;
+  note: string;
+}
+
 export function usePoopEntries() {
-  const [entries, setEntries] = useState([]);
+  const [entries, setEntries] = useState<PoopEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchEntries = useCallback(async (isMounted = { current: true }) => {
+  const fetchEntries = useCallback(async (isMounted: { current: boolean } = { current: true }) => {
     try {
       const response = await fetch(`${API_URL}/entries`);
       const data = await response.json();
@@ -28,7 +43,7 @@ export function usePoopEntries() {
     return () => { isMounted.current = false; };
   }, [fetchEntries]);
 
-  const addEntry = async (entry) => {
+  const addEntry = async (entry: EntryInput) => {
     try {
       const response = await fetch(`${API_URL}/entries`, {
         method: 'POST',
@@ -43,7 +58,7 @@ export function usePoopEntries() {
     }
   };
 
-  const updateEntry = async (id, updatedFields) => {
+  const updateEntry = async (id: string, updatedFields: Partial<EntryInput>) => {
     try {
       const response = await fetch(`${API_URL}/entries/${id}`, {
         method: 'PUT',
@@ -58,7 +73,7 @@ export function usePoopEntries() {
     }
   };
 
-  const deleteEntry = async (id) => {
+  const deleteEntry = async (id: string) => {
     try {
       const response = await fetch(`${API_URL}/entries/${id}`, {
         method: 'DELETE'

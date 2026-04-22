@@ -1,4 +1,31 @@
-export const translations = {
+export interface Translation {
+    title: string;
+    newEntry: string;
+    frequency7days: string;
+    history: string;
+    dateAndTime: string;
+    consistency: string;
+    amount: string;
+    selectAmount: string;
+    amountSmall: string;
+    amountNormal: string;
+    amountLarge: string;
+    notes: string;
+    notesPlaceholder: string;
+    logEntry: string;
+    noData: string;
+    noEntries: string;
+    types: Record<number, string>;
+    shortTypes: Record<number, string>;
+    chartLabel: string;
+    views: {
+        weekly: string;
+        yearly: string;
+        [key: string]: string;
+    };
+}
+
+export const translations: Record<string, Translation> = {
     en: {
         title: "Pootprint",
         newEntry: "New Entry",

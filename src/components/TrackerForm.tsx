@@ -1,6 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Translation } from '../i18n';
+import { PoopEntry, EntryInput } from '../hooks/usePoopEntries';
 
-function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry, t }) {
+interface TrackerFormProps {
+    onAddEntry: (entry: EntryInput) => Promise<void>;
+    onUpdateEntry: (id: string, entry: Partial<EntryInput>) => Promise<void>;
+    editingEntry: PoopEntry | null;
+    setEditingEntry: (entry: PoopEntry | null) => void;
+    t: Translation;
+}
+
+function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry, t }: TrackerFormProps) {
     const [formData, setFormData] = useState({
         date: new Date().toISOString().split('T')[0],
         time: new Date().toTimeString().split(' ')[0].slice(0, 5),
@@ -9,7 +19,7 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
         note: ''
     });
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (editingEntry) {
             const dateObj = new Date(editingEntry.datetime);
             setFormData({
@@ -22,9 +32,9 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
         }
     }, [editingEntry]);
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const entryData = {
+        const entryData: EntryInput = {
             datetime: new Date(`${formData.date}T${formData.time}`).toISOString(),
             consistency: formData.consistency,
             amount: formData.amount,
@@ -35,7 +45,7 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
             await onUpdateEntry(editingEntry.id, entryData);
             setEditingEntry(null);
         } else {
-            onAddEntry(entryData);
+            await onAddEntry(entryData);
         }
 
         // Reset form

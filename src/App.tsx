@@ -1,28 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { usePoopEntries } from './hooks/usePoopEntries';
+import { useState, useEffect } from 'react';
+import { usePoopEntries, PoopEntry } from './hooks/usePoopEntries';
 import TrackerForm from './components/TrackerForm';
 import TrackerChart from './components/TrackerChart';
 import EntryList from './components/EntryList';
 import { Sun, Moon } from 'lucide-react';
-import { translations } from './i18n';
+import { translations, Translation } from './i18n';
 
 function App() {
   const { entries, addEntry, updateEntry, deleteEntry } = usePoopEntries();
 
   // Editing State
-  const [editingEntry, setEditingEntry] = useState(null);
+  const [editingEntry, setEditingEntry] = useState<PoopEntry | null>(null);
 
   // Theme State
-  const [theme, setTheme] = useState(() => {
+  const [theme, setTheme] = useState<string>(() => {
     return localStorage.getItem('theme') || 'light';
   });
 
   // Language State
-  const [lang, setLang] = useState(() => {
+  const [lang, setLang] = useState<string>(() => {
     return localStorage.getItem('lang') || 'en';
   });
 
-  const t = translations[lang];
+  const t: Translation = translations[lang] || translations.en;
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -42,7 +42,7 @@ function App() {
   };
 
   // Chart View State
-  const [chartView, setChartView] = useState('weekly');
+  const [chartView, setChartView] = useState<'weekly' | 'yearly'>('weekly');
 
   return (
     <div className="max-w-[900px] mx-auto px-4 py-10 sm:px-5">
@@ -92,7 +92,7 @@ function App() {
                 {t.views[chartView]}
               </h2>
               <div className="flex border border-border">
-                {['weekly', 'yearly'].map(v => (
+                {(['weekly', 'yearly'] as const).map(v => (
                   <button
                     key={v}
                     onClick={() => setChartView(v)}
