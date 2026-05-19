@@ -1,5 +1,5 @@
 # Stage 1: Build the React frontend
-FROM node:20-slim AS frontend-builder
+FROM node:22-slim AS frontend-builder
 WORKDIR /app
 
 # Copy package files and install dependencies
@@ -11,7 +11,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Build the production backend
-FROM node:20-slim
+FROM node:22-slim
 WORKDIR /app
 
 # Set production environment
