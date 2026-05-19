@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: pootprint-app
+    container_name: pootprint
     ports:
       - "8080:3000"
     volumes:

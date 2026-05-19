@@ -95,7 +95,7 @@ if (process.env.NODE_ENV === 'production') {
             }
         }
     }));
-    app.get('*', (req, res) => {
+    app.get('/*splat', (req, res) => {
         res.sendFile(join(frontendDistPath, 'index.html'));
     });
 }
