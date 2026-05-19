@@ -14,8 +14,8 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     time: new Date().toTimeString().split(' ')[0].slice(0, 5),
-    consistency: 4,
-    amount: '',
+    consistency: 6,
+    amount: 'Normal',
     note: ''
   });
 
@@ -49,8 +49,8 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
     setFormData({
       date: new Date().toISOString().split('T')[0],
       time: new Date().toTimeString().split(' ')[0].slice(0, 5),
-      consistency: 4,
-      amount: '',
+      consistency: 6,
+      amount: 'Normal',
       note: ''
     });
   };
@@ -60,8 +60,8 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
     setFormData({
       date: new Date().toISOString().split('T')[0],
       time: new Date().toTimeString().split(' ')[0].slice(0, 5),
-      consistency: 4,
-      amount: '',
+      consistency: 6,
+      amount: 'Normal',
       note: ''
     });
   };
