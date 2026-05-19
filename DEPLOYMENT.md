@@ -9,43 +9,36 @@ This guide will help you deploy the Pootprint application on your self-hosted se
 
 ## Quick Start
 
-### 1. Build and Start the Containers
+### 1. Build and Start the Container
 
 ```bash
 docker compose up -d --build
 ```
 
 This command will:
-- Build the backend and frontend Docker images
-- Start both containers in detached mode
-- Mount the `./data` directory for the SQLite database
+- Build the unified React + Express application Docker image
+- Start the single container in detached mode
+- Mount the SQLite database volume for data persistence
 
 ### 2. Access the Application
 
-- **Frontend**: Open your browser and navigate to `http://localhost:8080` (or `http://your-server-ip:8080`)
-- **Backend API**: Available at `http://localhost:3000/api` (or `http://your-server-ip:3000/api`)
+- **Frontend & API**: Open your browser and navigate to `http://localhost:8080` (or `http://your-server-ip:8080`)
+- **Backend API Endpoints**: Available directly under `/api` on the same port (e.g., `http://localhost:8080/api/health`)
 
 ## Port and API Configuration
 
-The application uses the following default ports:
+The application runs internally on port `3000` but is exposed on port `8080` by default. 
 
-- **Frontend**: `8080`
-- **Backend**: `3000`
-
-To change ports, edit the `docker-compose.yml` file:
+To change the port exposed on your server, edit the port binding in `docker-compose.yml`:
 
 ```yaml
 services:
-  backend:
+  app:
     ports:
-      - "3000:3000"
-  
-  frontend:
-    ports:
-      - "8080:80"
+      - "8080:3000"  # Change "8080" to your preferred host port
 ```
 
-The frontend is configured to proxy requests starting with `/api` to the backend service. No manual `VITE_API_URL` configuration is needed for standard deployments.
+Because the frontend is served directly by the Express backend, all api requests are relative and run on the same port, resolving any CORS or routing proxy complexities.
 
 ## Managing the Application
 

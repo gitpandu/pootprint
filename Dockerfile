@@ -1,31 +1,39 @@
-# Build stage
-FROM node:20-alpine AS build
-
+# Stage 1: Build the React frontend
+FROM node:20-slim AS frontend-builder
 WORKDIR /app
 
-# Copy package files
+# Copy package files and install dependencies
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy source files
+# Copy source and build
 COPY . .
-
-# Build the application
 RUN npm run build
 
-# Production stage
-FROM nginx:alpine
+# Stage 2: Build the production backend
+FROM node:20-slim
+WORKDIR /app
 
-# Copy built files from build stage
-COPY --from=build /app/dist /usr/share/nginx/html
+# Set production environment
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV DB_PATH=/app/data/pootprint.db
 
-# Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy backend package configuration and install only production dependencies
+COPY backend/package*.json ./backend/
+WORKDIR /app/backend
+RUN npm ci --only=production
 
-# Expose port 80
-EXPOSE 80
+# Copy backend application source code
+COPY backend/ ./
 
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Copy built frontend assets from Stage 1 into the location expected by server.js
+COPY --from=frontend-builder /app/dist /app/dist
+
+# Create a data directory for the persistent SQLite database volume
+RUN mkdir -p /app/data
+
+EXPOSE 3000
+
+# Start server
+CMD ["node", "server.js"]

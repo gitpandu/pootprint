@@ -1,44 +1,33 @@
 services:
-  backend:
+  app:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile
-    container_name: pootprint-backend
+    container_name: pootprint-app
     ports:
-      - "3000:3000"
+      - "8080:3000"
     volumes:
       - pootprint-data:/app/data
     environment:
       - PORT=3000
       - DB_PATH=/app/data/pootprint.db
+      - NODE_ENV=production
     restart: unless-stopped
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1"]
-      interval: 10s
+      interval: 15s
       timeout: 5s
-      retries: 5
+      retries: 3
       start_period: 15s
-    networks:
-      - pootprint-network
-
-  frontend:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: pootprint-frontend
-    ports:
-      - "8080:80"
-    depends_on:
-      backend:
-        condition: service_healthy
-    restart: unless-stopped
-    networks:
-      - pootprint-network
+    # Resource constraints to safeguard the low-resource STB
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75'
+          memory: 150M
+        reservations:
+          memory: 40M
 
 volumes:
   pootprint-data:
     driver: local
-
-networks:
-  pootprint-network:
-    driver: bridge

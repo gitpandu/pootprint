@@ -1,0 +1,23 @@
+# Ignore local node modules and build outputs
+node_modules
+dist
+backend/node_modules
+backend/pootprint.db
+backend/data
+
+# Ignore git metadata
+.git
+.gitignore
+
+# Ignore IDE and OS files
+.vscode
+.idea
+.DS_Store
+*.log
+
+# Ignore documentation not needed in production container
+README.md
+DEPLOYMENT.md
+eslint.config.js
+tsconfig*.json
+nginx.conf

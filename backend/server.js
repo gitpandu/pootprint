@@ -1,7 +1,12 @@
 import express from 'express';
 import cors from 'cors';
 import { v4 as uuidv4 } from 'uuid';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import db from './database.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -75,6 +80,15 @@ app.delete('/api/entries/:id', (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
+// Serve frontend static files in production
+if (process.env.NODE_ENV === 'production') {
+    const frontendDistPath = join(__dirname, '../dist');
+    app.use(express.static(frontendDistPath));
+    app.get('*', (req, res) => {
+        res.sendFile(join(frontendDistPath, 'index.html'));
+    });
+}
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
