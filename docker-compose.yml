@@ -1,5 +1,6 @@
 services:
-  app:
+  pootprint:
+    image: pootprint
     build:
       context: .
       dockerfile: Dockerfile

@@ -33,7 +33,7 @@ To change the port exposed on your server, edit the port binding in `docker-comp
 
 ```yaml
 services:
-  app:
+  pootprint:
     ports:
       - "8080:3000"  # Change "8080" to your preferred host port
 ```
@@ -45,14 +45,8 @@ Because the frontend is served directly by the Express backend, all api requests
 ### View Logs
 
 ```bash
-# All services
+# All logs
 docker compose logs -f
-
-# Backend only
-docker compose logs -f backend
-
-# Frontend only
-docker compose logs -f frontend
 ```
 
 ### Stop the Application
@@ -82,15 +76,15 @@ The SQLite database is stored in a Docker volume named `pootprint-data`. This en
 To backup your database, copy the `pootprint.db` file from the running container:
 
 ```bash
-docker cp pootprint-backend:/app/data/pootprint.db ./backup-pootprint.db
+docker cp pootprint:/app/data/pootprint.db ./backup-pootprint.db
 ```
 
 ### Restore Data
 
 1. Stop the application: `docker compose down`
-2. Start only the volume/service: `docker compose up -d backend`
-3. Copy your backup into the container: `docker cp ./backup-pootprint.db pootprint-backend:/app/data/pootprint.db`
-4. Restart the backend: `docker compose restart backend`
+2. Start only the volume/service: `docker compose up -d pootprint`
+3. Copy your backup into the container: `docker cp ./backup-pootprint.db pootprint:/app/data/pootprint.db`
+4. Restart the container: `docker compose restart pootprint`
 
 ## Troubleshooting
 
@@ -103,9 +97,9 @@ docker cp pootprint-backend:/app/data/pootprint.db ./backup-pootprint.db
 
 2. Verify the `VITE_API_URL` build argument in your `docker-compose.yml` file or environment.
 
-3. Check backend logs:
+3. Check container logs:
    ```bash
-   docker compose logs backend
+   docker compose logs pootprint
    ```
 
 ### Port already in use
@@ -149,8 +143,8 @@ docker compose down
 # Remove data volume (WARNING: This deletes all your logged entries!)
 docker volume rm pootprint_pootprint-data
 
-# Remove images
-docker rmi pootprint-frontend pootprint-backend
+# Remove image
+docker rmi pootprint
 ```
 
 ## Support
