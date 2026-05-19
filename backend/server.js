@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression';
 import { v4 as uuidv4 } from 'uuid';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
@@ -11,6 +12,7 @@ const __dirname = dirname(__filename);
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(compression());
 app.use(cors());
 app.use(express.json());
 
@@ -84,7 +86,15 @@ app.delete('/api/entries/:id', (req, res) => {
 // Serve frontend static files in production
 if (process.env.NODE_ENV === 'production') {
     const frontendDistPath = join(__dirname, '../dist');
-    app.use(express.static(frontendDistPath));
+    app.use(express.static(frontendDistPath, {
+        maxAge: '1y',
+        immutable: true,
+        setHeaders: (res, filePath) => {
+            if (filePath.endsWith('.html')) {
+                res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+            }
+        }
+    }));
     app.get('*', (req, res) => {
         res.sendFile(join(frontendDistPath, 'index.html'));
     });
