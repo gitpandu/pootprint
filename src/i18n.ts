@@ -23,6 +23,23 @@ export interface Translation {
         yearly: string;
         [key: string]: string;
     };
+    quickLog: string;
+    justNow: string;
+    minAgo15: string;
+    hourAgo1: string;
+    frequency: string;
+    consistencyTrend: string;
+    statsAverage: string;
+    statsStreak: string;
+    statsDominant: string;
+    statsTotal: string;
+    searchPlaceholder: string;
+    filterAll: string;
+    filterConstipation: string;
+    filterIdeal: string;
+    filterLoose: string;
+    daysActive: string;
+    idealRange: string;
 }
 
 export const translations: Record<string, Translation> = {
@@ -65,7 +82,24 @@ export const translations: Record<string, Translation> = {
         views: {
             weekly: "Weekly",
             yearly: "Yearly"
-        }
+        },
+        quickLog: "Quick Log (Ideal)",
+        justNow: "Just now",
+        minAgo15: "15m ago",
+        hourAgo1: "1h ago",
+        frequency: "Frequency",
+        consistencyTrend: "Consistency Trend",
+        statsAverage: "Average Consistency",
+        statsStreak: "Active Streak",
+        statsDominant: "Dominant Type",
+        statsTotal: "Total Logs",
+        searchPlaceholder: "Search notes...",
+        filterAll: "All",
+        filterConstipation: "Constipation (1-2)",
+        filterIdeal: "Ideal (3-4)",
+        filterLoose: "Loose (5-7)",
+        daysActive: "days",
+        idealRange: "Ideal Range"
     },
     id: {
         title: "Pootprint",
@@ -106,6 +140,23 @@ export const translations: Record<string, Translation> = {
         views: {
             weekly: "Mingguan",
             yearly: "Tahunan"
-        }
+        },
+        quickLog: "Catat Cepat (Ideal)",
+        justNow: "Baru saja",
+        minAgo15: "15m lalu",
+        hourAgo1: "1j lalu",
+        frequency: "Frekuensi",
+        consistencyTrend: "Tren Konsistensi",
+        statsAverage: "Rata-rata Konsistensi",
+        statsStreak: "Streak Aktif",
+        statsDominant: "Tipe Dominan",
+        statsTotal: "Total Catatan",
+        searchPlaceholder: "Cari catatan...",
+        filterAll: "Semua",
+        filterConstipation: "Sembelit (1-2)",
+        filterIdeal: "Ideal (3-4)",
+        filterLoose: "Lembek/Cair (5-7)",
+        daysActive: "hari",
+        idealRange: "Skala Ideal"
     }
 };

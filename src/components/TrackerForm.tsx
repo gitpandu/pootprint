@@ -14,7 +14,7 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
   const [formData, setFormData] = useState({
     date: new Date().toISOString().split('T')[0],
     time: new Date().toTimeString().split(' ')[0].slice(0, 5),
-    consistency: 6,
+    consistency: 4,
     amount: 'Normal',
     note: ''
   });
@@ -49,7 +49,24 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
     setFormData({
       date: new Date().toISOString().split('T')[0],
       time: new Date().toTimeString().split(' ')[0].slice(0, 5),
-      consistency: 6,
+      consistency: 4,
+      amount: 'Normal',
+      note: ''
+    });
+  };
+
+  const handleQuickLog = async () => {
+    const entryData: EntryInput = {
+      datetime: new Date().toISOString(),
+      consistency: 4,
+      amount: 'Normal',
+      note: ''
+    };
+    await onAddEntry(entryData);
+    setFormData({
+      date: new Date().toISOString().split('T')[0],
+      time: new Date().toTimeString().split(' ')[0].slice(0, 5),
+      consistency: 4,
       amount: 'Normal',
       note: ''
     });
@@ -60,10 +77,22 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
     setFormData({
       date: new Date().toISOString().split('T')[0],
       time: new Date().toTimeString().split(' ')[0].slice(0, 5),
-      consistency: 6,
+      consistency: 4,
       amount: 'Normal',
       note: ''
     });
+  };
+
+  const setPresetTime = (minutesOffset: number) => {
+    const now = new Date();
+    if (minutesOffset > 0) {
+      now.setMinutes(now.getMinutes() - minutesOffset);
+    }
+    setFormData(prev => ({
+      ...prev,
+      date: now.toISOString().split('T')[0],
+      time: now.toTimeString().split(' ')[0].slice(0, 5)
+    }));
   };
 
   return (
@@ -72,16 +101,22 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
         .tf-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 14px 20px;
+          gap: 20px 24px;
         }
 
         .tf-field {
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 8px;
         }
 
         .tf-field.full { grid-column: 1 / -1; }
+
+        .tf-field-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
 
         .tf-label {
           font-family: var(--font-mono);
@@ -91,7 +126,30 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
           color: var(--ink-60);
         }
 
-        .tf-input, .tf-select {
+        .tf-presets {
+          display: flex;
+          gap: 8px;
+        }
+
+        .tf-preset-btn {
+          background: transparent;
+          border: none;
+          font-family: var(--font-mono);
+          font-size: 9px;
+          letter-spacing: 0.06em;
+          color: var(--ink-30);
+          cursor: pointer;
+          transition: color 0.15s;
+          text-transform: uppercase;
+          border-bottom: 1px dashed transparent;
+        }
+
+        .tf-preset-btn:hover {
+          color: var(--ink);
+          border-color: var(--ink-30);
+        }
+
+        .tf-input {
           appearance: none;
           background: transparent;
           border: 1px solid var(--hairline);
@@ -100,26 +158,14 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
           font-family: var(--font-sans);
           font-size: 13.5px;
           font-weight: 400;
-          padding: 9px 12px;
+          padding: 10px 12px;
           width: 100%;
           transition: border-color 0.15s, box-shadow 0.15s;
           outline: none;
           -webkit-appearance: none;
         }
 
-        .tf-select {
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(10,10,10,0.3)'/%3E%3C/svg%3E");
-          background-repeat: no-repeat;
-          background-position: right 12px center;
-          padding-right: 32px;
-          cursor: pointer;
-        }
-
-        [data-theme="dark"] .tf-select {
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='rgba(237,233,227,0.4)'/%3E%3C/svg%3E");
-        }
-
-        .tf-input:focus, .tf-select:focus {
+        .tf-input:focus {
           border-color: var(--ink-60);
           box-shadow: 0 0 0 3px var(--ink-5);
         }
@@ -138,16 +184,99 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
           filter: invert(1);
         }
 
-        .tf-select option { background: var(--paper); color: var(--ink); }
+        /* Bristol Card Selector */
+        .tf-bristol-grid {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 6px;
+          margin-top: 2px;
+        }
+
+        .bristol-card {
+          background: transparent;
+          border: 1px solid var(--hairline);
+          padding: 10px 4px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.15s var(--ease);
+          border-radius: 0;
+          color: var(--ink-60);
+          text-align: center;
+        }
+
+        .bristol-card:hover {
+          border-color: var(--hairline-strong);
+          color: var(--ink);
+          background: var(--ink-5);
+        }
+
+        .bristol-num {
+          font-family: var(--font-mono);
+          font-size: 15px;
+          font-weight: 500;
+          margin-bottom: 3px;
+        }
+
+        .bristol-label {
+          font-family: var(--font-sans);
+          font-size: 9px;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+
+        /* Card Active State */
+        .bristol-card.active {
+          background: var(--ink);
+          color: var(--paper);
+          border-color: var(--ink);
+        }
+
+        /* Pill Group for Amount */
+        .tf-pill-group {
+          display: flex;
+          border: 1px solid var(--hairline);
+          width: 100%;
+        }
+
+        .tf-pill {
+          flex: 1;
+          background: transparent;
+          border: none;
+          padding: 10px 12px;
+          font-family: var(--font-sans);
+          font-size: 13px;
+          color: var(--ink-60);
+          cursor: pointer;
+          transition: all 0.12s var(--ease);
+          text-align: center;
+          outline: none;
+        }
+
+        .tf-pill + .tf-pill {
+          border-left: 1px solid var(--hairline);
+        }
+
+        .tf-pill:hover {
+          background: var(--ink-5);
+          color: var(--ink);
+        }
+
+        .tf-pill.active {
+          background: var(--ink);
+          color: var(--paper);
+        }
 
         .tf-actions {
           display: flex;
-          gap: 8px;
-          margin-top: 20px;
+          gap: 10px;
+          margin-top: 24px;
         }
 
         .btn-primary {
-          flex: 1;
+          flex: 2;
           background: var(--ink);
           color: var(--paper);
           border: 1px solid var(--ink);
@@ -160,7 +289,27 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
           transition: opacity 0.15s;
         }
 
-        .btn-primary:hover { opacity: 0.8; }
+        .btn-primary:hover { opacity: 0.85; }
+
+        .btn-secondary {
+          flex: 1.2;
+          background: transparent;
+          color: var(--ink);
+          border: 1px solid var(--ink);
+          font-family: var(--font-mono);
+          font-size: 10px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          padding: 11px 16px;
+          cursor: pointer;
+          transition: background 0.15s, color 0.15s;
+          white-space: nowrap;
+        }
+
+        .btn-secondary:hover {
+          background: var(--ink);
+          color: var(--paper);
+        }
 
         .btn-ghost {
           background: transparent;
@@ -180,16 +329,58 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
           color: var(--ink);
         }
 
-        @media (max-width: 480px) {
-          .tf-grid { grid-template-columns: 1fr; }
-          .tf-field.full { grid-column: 1; }
+        /* Mobile Optimization Rules */
+        @media (max-width: 500px) {
+          .tf-grid {
+            gap: 16px 14px;
+          }
+          .tf-bristol-grid {
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+          }
+          .bristol-card {
+            padding: 8px 2px;
+          }
+          .bristol-num {
+            font-size: 13px;
+            margin-bottom: 1px;
+          }
+          .bristol-label {
+            font-size: 7.5px;
+            letter-spacing: -0.02em;
+          }
+          .tf-pill {
+            padding: 8px 6px;
+            font-size: 12px;
+          }
+          .tf-preset-btn {
+            font-size: 8px;
+            gap: 4px;
+          }
+        }
+
+        @media (max-width: 400px) {
+          .tf-actions {
+            gap: 8px;
+          }
+          .btn-primary, .btn-secondary, .btn-ghost {
+            font-size: 9px;
+            padding: 10px 10px;
+          }
         }
       `}</style>
 
       <form onSubmit={handleSubmit}>
         <div className="tf-grid">
           <div className="tf-field">
-            <label className="tf-label">{t.dateAndTime.split(' ')[0] || 'Date'}</label>
+            <div className="tf-field-header">
+              <label className="tf-label">{t.dateAndTime.split(' ')[0] || 'Date'}</label>
+              <div className="tf-presets">
+                <button type="button" className="tf-preset-btn" onClick={() => setPresetTime(0)}>{t.justNow}</button>
+                <button type="button" className="tf-preset-btn" onClick={() => setPresetTime(15)}>{t.minAgo15}</button>
+                <button type="button" className="tf-preset-btn" onClick={() => setPresetTime(60)}>{t.hourAgo1}</button>
+              </div>
+            </div>
             <input
               type="date"
               required
@@ -210,31 +401,55 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
             />
           </div>
 
-          <div className="tf-field">
+          <div className="tf-field full">
             <label className="tf-label">{t.consistency}</label>
-            <select
-              className="tf-select"
-              value={formData.consistency}
-              onChange={e => setFormData({ ...formData, consistency: Number(e.target.value) })}
-            >
-              {Object.entries(t.types).map(([value, label]) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
+            <div className="tf-bristol-grid">
+              {[1, 2, 3, 4, 5, 6, 7].map(num => {
+                const isSelected = formData.consistency === num;
+
+                const labelText = t.shortTypes[num].includes('(')
+                  ? t.shortTypes[num].split('(')[1].replace(')', '')
+                  : t.shortTypes[num];
+
+                return (
+                  <button
+                    key={num}
+                    type="button"
+                    className={`bristol-card ${isSelected ? 'active' : ''}`}
+                    onClick={() => setFormData({ ...formData, consistency: num })}
+                  >
+                    <span className="bristol-num">{num}</span>
+                    <span className="bristol-label">{labelText}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="tf-field">
             <label className="tf-label">{t.amount}</label>
-            <select
-              className="tf-select"
-              value={formData.amount || ''}
-              onChange={e => setFormData({ ...formData, amount: e.target.value })}
-            >
-              <option value="">{t.selectAmount}</option>
-              <option value="Small">{t.amountSmall}</option>
-              <option value="Normal">{t.amountNormal}</option>
-              <option value="Large">{t.amountLarge}</option>
-            </select>
+            <div className="tf-pill-group">
+              {[
+                { value: 'Small', label: t.amountSmall },
+                { value: 'Normal', label: t.amountNormal },
+                { value: 'Large', label: t.amountLarge }
+              ].map(opt => {
+                const isSelected = formData.amount === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    className={`tf-pill ${isSelected ? 'active' : ''}`}
+                    onClick={() => setFormData(prev => ({
+                      ...prev,
+                      amount: prev.amount === opt.value ? '' : opt.value
+                    }))}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
           <div className="tf-field full">
@@ -253,6 +468,11 @@ function TrackerForm({ onAddEntry, onUpdateEntry, editingEntry, setEditingEntry,
           <button type="submit" className="btn-primary">
             {editingEntry ? 'Update Entry' : t.logEntry}
           </button>
+          {!editingEntry && (
+            <button type="button" className="btn-secondary" onClick={handleQuickLog}>
+              {t.quickLog}
+            </button>
+          )}
           {editingEntry && (
             <button type="button" className="btn-ghost" onClick={handleCancel}>
               Cancel
